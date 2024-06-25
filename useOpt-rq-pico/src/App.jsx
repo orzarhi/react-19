@@ -26,13 +26,11 @@ export const App = () => {
     initialData: []
   })
 
-
   const formRef = useRef(null)
 
   const [optimisticTodos, simplifiedAddTodo] = useOptimistic(todos,
     (state, text) => [...state, { id: Date.now(), text }]
   )
-
 
   const { mutateAsync: addTodoMutation } = useMutation({
     mutationKey: ['addTodo'],

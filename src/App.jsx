@@ -1,4 +1,5 @@
-import { useEffect, useState, useOptimistic, useRef, useActionState } from "react"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { useActionState, useOptimistic, useRef } from "react"
 
 const getTodos = async () => {
   const response = await fetch('http://localhost:8080/api/todos')
@@ -19,7 +20,12 @@ const addTodo = async (text) => {
 }
 
 export const App = () => {
-  const [todos, setTodos] = useState([])
+  const { data: todos, refetch } = useQuery({
+    queryKey: ['todos'],
+    queryFn: getTodos,
+    initialData: []
+  })
+
 
   const formRef = useRef(null)
 
@@ -27,17 +33,23 @@ export const App = () => {
     (state, text) => [...state, { id: Date.now(), text }]
   )
 
+
+  const { mutateAsync: addTodoMutation } = useMutation({
+    mutationKey: ['addTodo'],
+    onMutate: simplifiedAddTodo,
+    mutationFn: addTodo,
+    onSuccess: refetch
+
+  })
+
   const addNewTodo = async () => {
     const formData = new FormData(formRef.current)
     const newTodo = formData.get('text')
 
     if (!newTodo) return;
 
-    simplifiedAddTodo(newTodo)
-
     try {
-      await addTodo(newTodo)
-      setTodos(await getTodos())
+      await addTodoMutation(newTodo)
     } catch (error) {
       console.error(error)
     } finally {
@@ -48,7 +60,6 @@ export const App = () => {
 
   const [actionState, addNewTodoWithState, isPending] = useActionState(addNewTodo)
 
-  useEffect(() => { getTodos().then(setTodos) }, [])
 
   return (
     <>

@@ -22,17 +22,15 @@ export const App = () => {
   const [todos, setTodos] = useState([])
   const [newTodo, setNewTodo] = useState('')
 
-  const [optimisticTodos, setOptimisticTodos] = useOptimistic(todos)
+  const [optimisticTodos, simplifiedAddTodo] = useOptimistic(todos,
+    (state, text) => [...state, { id: Date.now(), text }]
+  )
   const [isPending, startTransition] = useTransition()
 
   const addNewTodo = async () => {
     if (!newTodo) return;
 
-    setOptimisticTodos((todos) => [
-      ...todos,
-      { id: Date.now(), text: newTodo }
-    ])
-
+    simplifiedAddTodo(newTodo)
 
     await addTodo(newTodo)
     setTodos(await getTodos())
@@ -53,6 +51,7 @@ export const App = () => {
       <div>
         <input
           type="text"
+          disabled={isPending}
           placeholder="New todo"
           value={newTodo}
           onChange={({ target }) => setNewTodo(target.value)}

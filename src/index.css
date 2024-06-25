@@ -1,0 +1,9 @@
+body {
+	margin: auto;
+	max-width: 800px;
+	margin-top: 3rem;
+	background-color: rgba(170, 170, 170, 0.248);
+	border: 1px solid rgba(0, 0, 0, 0.329);
+	border-radius: 2rem;
+	padding: 1rem;
+}

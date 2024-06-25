@@ -1,4 +1,4 @@
-import { useEffect, useState, useOptimistic, useTransition } from "react"
+import { useEffect, useState, useOptimistic, useRef } from "react"
 
 const getTodos = async () => {
   const response = await fetch('http://localhost:8080/api/todos')
@@ -20,14 +20,16 @@ const addTodo = async (text) => {
 
 export const App = () => {
   const [todos, setTodos] = useState([])
-  const [newTodo, setNewTodo] = useState('')
+
+  const formRef = useRef(null)
 
   const [optimisticTodos, simplifiedAddTodo] = useOptimistic(todos,
     (state, text) => [...state, { id: Date.now(), text }]
   )
-  const [isPending, startTransition] = useTransition()
 
-  const addNewTodo = async () => {
+  const addNewTodo = async (formData) => {
+    const newTodo = formData.get('text')
+
     if (!newTodo) return;
 
     simplifiedAddTodo(newTodo)
@@ -38,7 +40,7 @@ export const App = () => {
     } catch (error) {
       console.error(error)
     } finally {
-      setNewTodo('')
+      formRef.current.reset()
     }
 
   }
@@ -53,18 +55,13 @@ export const App = () => {
           <li key={todo.id}>{todo.text}</li>
         ))}
       </ul>
-      <div>
+      <form action={addNewTodo} ref={formRef}>
         <input
           type="text"
-          disabled={isPending}
+          name="text"
           placeholder="New todo"
-          value={newTodo}
-          onChange={({ target }) => setNewTodo(target.value)}
-          onKeyUp={({ key }) => {
-            if (key === 'Enter') startTransition(() => addNewTodo())
-          }}
         />
-      </div>
+      </form>
     </>
   )
 }

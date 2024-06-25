@@ -32,9 +32,14 @@ export const App = () => {
 
     simplifiedAddTodo(newTodo)
 
-    await addTodo(newTodo)
-    setTodos(await getTodos())
-    setNewTodo('')
+    try {
+      await addTodo(newTodo)
+      setTodos(await getTodos())
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setNewTodo('')
+    }
 
   }
 

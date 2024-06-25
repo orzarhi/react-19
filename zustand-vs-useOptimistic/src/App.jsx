@@ -30,7 +30,7 @@ const useTodos = create((set, get) => ({
       isPending: true,
       todos: [
         ...get().todos,
-        { id: Date.now(), text },
+        { id: Date.now(), text, opacity: 0.5 },
       ],
     });
 
@@ -53,14 +53,19 @@ export const App = () => {
     <>
       <ul>
         {todos.map((todo) => (
-          <li key={todo.id}>{todo.text}</li>
+          <li
+            key={todo.id}
+            style={{ opacity: todo?.opacity }}
+          >
+            {todo.text}
+          </li>
         ))}
       </ul>
       <div>
         <input
           type="text"
           disabled={isPending}
-          placeholder={isPending ? "Adding todo..." : "Add todo"}
+          placeholder={'Add todo'}
           onKeyUp={(event) => {
             if (event.key === "Enter") {
               postTodo(event.target.value);
